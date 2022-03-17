@@ -2,19 +2,11 @@ const {ApolloServer, gql} = require('apollo-server')
 const connectDb = require('./config/db')
 
 
+
 connectDb()
-const typeDefs = gql`
-    type Query{
-         sayHi : String!
-    }
-`
+const typeDefs = require('./graphql/TypeDef')
 
-const resolvers = {
-   Query: {
-       sayHi:()=> 'hell' 
-   }
-
-}
+const resolvers = require('./graphql/resolvers/main')
 
 const server = new ApolloServer({
     typeDefs,
