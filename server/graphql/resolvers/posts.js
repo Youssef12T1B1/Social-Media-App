@@ -2,7 +2,7 @@ const Post = require("../../models/post");
 
 const { validateCreatePost } = require("../validator");
 const { UserInputError, AuthenticationError } = require("apollo-server");
-const { User } = require("./main");
+
 module.exports = {
   Query: {
     async getPosts(_, __, { user }) {
@@ -76,6 +76,24 @@ module.exports = {
         return "Post Deleted";
       } catch (err) {
         throw new Error(err);
+      }
+    },
+    async likePost(_, { postId }, { user }) {
+      if (!user) throw new AuthenticationError("Authentication Failed");
+
+      const post = await Post.findById(postId);
+      if (!post) throw new UserInputError("No post Found");
+      if (post) {
+        if (post.likes.find((l) => l.username === user.username)) {
+          post.likes = post.likes.filter((l) => l.username !== user.username);
+        } else {
+          post.likes.push({
+            username: user.username,
+            createdAt: new Date().toISOString(),
+          });
+        }
+        await post.save();
+        return post;
       }
     },
   },

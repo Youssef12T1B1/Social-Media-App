@@ -14,8 +14,8 @@ const postSchema = new mongoose.Schema(
     likes: [
       {
         username: String,
+        createdAt: String,
       },
-      { timestamps: true },
     ],
     user: {
       type: mongoose.Schema.Types.ObjectId,
