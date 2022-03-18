@@ -1,6 +1,10 @@
 const Post = require("../../models/post");
 
-const { validateCreateComment, validateEditComment } = require("../validator");
+const {
+  validateCreateComment,
+  validateEditComment,
+  validateDeleteComment,
+} = require("../validator");
 const { AuthenticationError, UserInputError } = require("apollo-server");
 
 module.exports = {
@@ -27,7 +31,7 @@ module.exports = {
     },
     async editComment(_, { postId, body, commentId }, { user }) {
       if (!user) throw new AuthenticationError("Authentication failed");
-      const { valid, errors } = validateEditComment();
+      const { valid, errors } = validateEditComment(postId, body, commentId);
       if (!valid) {
         throw new UserInputError("Errors", { errors });
       }
@@ -36,13 +40,37 @@ module.exports = {
         throw new UserInputError("The post has been deleted");
       }
       if (Testpost) {
-        if (Testpost.username !== user.username) {
-          throw new UserInputError("no Edit for u buddy");
+        const FindIndex = Testpost.comments.findIndex(
+          (com) => com.id === commentId
+        );
+        if (Testpost.comments[FindIndex].username === user.username) {
+          Testpost.comments[FindIndex].body = body;
+          await Testpost.save();
+          return Testpost;
+        } else {
+          throw new UserInputError("no edit for u buddy");
         }
       }
-      Testpost.content = content;
-      Testpost.save();
-      return Testpost;
+    },
+    async deleteComment(_, { postId, commentId }, { user }) {
+      if (!user) throw new AuthenticationError("Authentication failed");
+      const { valid, errors } = validateDeleteComment(postId, commentId);
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
+      const post = await Post.findById(postId);
+      if (!post) throw new UserInputError("This Post has been Deleted");
+      if (post) {
+        const Index = post.comments.findIndex((com) => com.id === commentId);
+
+        if (post.comments[Index].username === user.username) {
+          post.comments.splice(Index, 1);
+          await post.save();
+          return post;
+        } else {
+          throw new UserInputError("no delete for u buddy");
+        }
+      }
     },
   },
 };

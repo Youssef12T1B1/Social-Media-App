@@ -68,3 +68,13 @@ module.exports.validateEditComment = (commentId, body, postId) => {
     valid: Object.keys(errors).length < 1,
   };
 };
+
+module.exports.validateDeleteComment = (commentId, postId) => {
+  const errors = {};
+  if (postId.trim() === "") errors.post = "Cant Delete post with no Id ";
+  if (commentId.trim() === "") errors.comment = "Comment ID must not be Empty";
+  return {
+    errors,
+    valid: Object.keys(errors).length < 1,
+  };
+};
