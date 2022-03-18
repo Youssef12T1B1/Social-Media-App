@@ -1,5 +1,5 @@
 const Post = require("../../models/post");
-const User = require("../../models/user");
+
 const { validateCreatePost } = require("../validator");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const { User } = require("./main");
@@ -48,12 +48,34 @@ module.exports = {
 
       return res;
     },
-    async editPost(_, { postId }, { user }) {
-      if (!user) throw AuthenticationError("Authentication failed");
+    async editPost(_, { postId, content }, { user }) {
+      if (!user) throw new AuthenticationError("Authentication failed");
+      const { valid, errors } = validateCreatePost(content);
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
 
       const Testpost = await Post.findById(postId);
       if (Testpost.username !== user.username) {
         throw new UserInputError("no Edit for u buddy");
+      }
+      Testpost.content = content;
+      Testpost.save();
+      return Testpost;
+    },
+    async deletePost(_, { postId }, { user }) {
+      try {
+        if (!user) throw new AuthenticationError("Authentication failed");
+
+        const Testpost = await Post.findById(postId);
+        if (Testpost.username !== user.username) {
+          throw new UserInputError("no delete for u buddy");
+        }
+
+        await Testpost.delete();
+        return "Post Deleted";
+      } catch (err) {
+        throw new Error(err);
       }
     },
   },

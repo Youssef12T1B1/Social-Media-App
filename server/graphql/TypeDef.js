@@ -7,6 +7,11 @@ module.exports = gql`
     createdAt: String!
     username: String!
   }
+  input PostInput {
+    content: String!
+    username: String!
+    user: ID!
+  }
   input RegisterInput {
     username: String!
     email: String!
@@ -28,6 +33,6 @@ module.exports = gql`
     login(username: String!, password: String!): User!
     createPost(content: String!): Post!
     deletePost(postId: ID!): String!
-    editPost(postId: ID!): Post!
+    editPost(postId: ID!, content: String!): Post!
   }
 `;
