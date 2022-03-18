@@ -57,3 +57,14 @@ module.exports.validateCreateComment = (body, postId) => {
     valid: Object.keys(errors).length < 1,
   };
 };
+
+module.exports.validateEditComment = (commentId, body, postId) => {
+  const errors = {};
+  if (body.trim() === "") errors.body = "Comment body Must not be Empty";
+  if (postId.trim() === "") errors.post = "Cant edit post with no Id ";
+  if (commentId.trim() === "") errors.comment = "Post ID must not be Empty";
+  return {
+    errors,
+    valid: Object.keys(errors).length < 1,
+  };
+};
