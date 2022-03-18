@@ -46,3 +46,14 @@ module.exports.validateCreatePost = (content) => {
     valid: Object.keys(errors).length < 1,
   };
 };
+
+module.exports.validateCreateComment = (body, postId) => {
+  const errors = {};
+  if (body.trim() === "" || postId.trim() === "")
+    errors.comment = "Comment body Must not be Empty";
+
+  return {
+    errors,
+    valid: Object.keys(errors).length < 1,
+  };
+};
