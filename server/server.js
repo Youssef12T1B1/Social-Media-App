@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer, gql, PubSub } = require("apollo-server");
 const connectDb = require("./config/db");
 const Is_Auth = require("./graphql/Middleware/auth");
 
