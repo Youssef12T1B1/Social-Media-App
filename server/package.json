@@ -10,11 +10,15 @@
   "author": "Youssef",
   "license": "ISC",
   "dependencies": {
+    "@graphql-tools/schema": "^8.3.3",
     "apollo-server": "^3.6.4",
     "bcryptjs": "^2.4.3",
+    "express": "^4.17.3",
     "graphql": "^16.3.0",
+    "graphql-subscriptions": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.2.7"
+    "mongoose": "^6.2.7",
+    "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
