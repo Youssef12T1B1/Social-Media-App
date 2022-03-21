@@ -1,8 +1,9 @@
 const Post = require("../../models/post");
-const { withFilter } = require("graphql-subscriptions");
+
 const { validateCreatePost } = require("../validator");
 const { UserInputError, AuthenticationError } = require("apollo-server");
-
+const { PubSub } = require("graphql-subscriptions");
+const pubsub = new PubSub();
 module.exports = {
   Query: {
     async getPosts(_, __, { user }) {
@@ -31,7 +32,7 @@ module.exports = {
     },
   },
   Mutation: {
-    async createPost(_, { content }, { user, pubsub }) {
+    async createPost(_, { content }, { user }) {
       if (!user) throw new AuthenticationError("Authentication Failed");
       const { valid, errors } = validateCreatePost(content);
       if (!valid) {
@@ -99,17 +100,7 @@ module.exports = {
   },
   Subscription: {
     newPost: {
-      subscribe: withFilter(
-        (_, __, { user, pubsub }) => {
-          return pubsub.asyncIterator(["NEW_POST"]);
-        },
-        ({ newPost }, _, { user }) => {
-          if (newPost.user.username === user.username) {
-            return true;
-          }
-          return false;
-        }
-      ),
+      subscribe: () => pubsub.asyncIterator("NEW_POST"),
     },
   },
 };

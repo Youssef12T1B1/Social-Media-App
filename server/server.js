@@ -11,27 +11,28 @@ connectDb();
 
 const typeDefs = require("./graphql/TypeDef");
 const resolvers = require("./graphql/resolvers/main");
-const app = express();
-const httpSrever = createServer(app);
-const schema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
-});
-const subscriptionServer = SubscriptionServer.create(
-  {
-    schema,
-    execute,
-    subscribe,
-  },
-  {
-    server: httpSrever,
-    path: "/graphql",
-  }
-);
 
-let apolloServer = null;
-async function startServer() {
-  apolloServer = new ApolloServer({
+(async function () {
+  const app = express();
+  const httpSrever = createServer(app);
+
+  const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers,
+  });
+  const subscriptionServer = SubscriptionServer.create(
+    {
+      schema,
+      execute,
+      subscribe,
+    },
+    {
+      server: httpSrever,
+      path: "/graphql",
+    }
+  );
+
+  const server = new ApolloServer({
     schema,
 
     plugins: [
@@ -47,9 +48,10 @@ async function startServer() {
     ],
     context: Is_Auth,
   });
-  await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
-}
-startServer();
+  await server.start();
+  server.applyMiddleware({ app });
 
-httpSrever.listen({ port: 4000 });
+  httpSrever.listen({ port: 4000 }, () => {
+    console.log("server is running on 4000");
+  });
+})();
